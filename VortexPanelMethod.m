@@ -1,18 +1,11 @@
 clc
 clear
-hold on
-grid on
-%axis([0 1 -1 1])
-% Xb = [1,0.933,0.75,0.5,0.25,0.067,0,0.067,0.25,0.5,0.75,0.933,1]
-% Yb = [0,-0.005,-0.017,-0.033,-0.042,-0.033,0,0.045,0.076,0.072,0.044,0.013,0]
-%Input Yb dari JavaFoil harus dibalik
-%Jangan lupa ubah M
-% Xb = [0,0.067,0.25,0.5,0.75,0.933,1];
-% Yb = [0,0.045,0.076,0.072,0.044,0.013,0];
-XbIn = fscanf(fopen('Xbody.txt'),'%f');
-YbIn = fscanf(fopen('Ybody.txt'),'%f');
-Xb = XbIn';
-Yb = YbIn';
+load airfoil_coord.txt;
+
+%Reverse indexing, panel 1 begin from lower section trailing edge
+foilcoord = flip(airfoil_coord);
+Xb = foilcoord(:,1)'; 
+Yb = foilcoord(:,2)'; 
 
 M = length(Xb)-1;
 MP1 = M + 1;
@@ -81,4 +74,6 @@ CpPlot = -Cp./max(Cp);
 plot(Xb,Yb)
 plot(X,Vplot)
 plot(X,CpPlot)
+grid on
+hold on
 Xp = X';

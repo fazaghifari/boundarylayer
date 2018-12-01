@@ -72,8 +72,6 @@ Vtan = RHSC' + AT*Gam; Vplot = Vtan./max(Vtan);
 Cp = 1-Vtan.^2;
 CpPlot = -Cp./max(Cp);
 plot(Xb,Yb)
-plot(X,Vplot)
-plot(X,CpPlot)
+plot(X,CpPlot,'-o')
 grid on
-hold on
 Xp = X';

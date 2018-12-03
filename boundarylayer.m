@@ -1,18 +1,19 @@
-function [Cf,delta] = boundarylayer(U,Vtan,X,Y)
+function [Cf,delta,G] = boundarylayer(U,Vtan,X,Y)
     %% ________________________________THWAITES__________________________________
     %Referensi : Dinamika Fluida (Lavi R Zuhal), Viscous Flow (Frank White),Intro
                 % to theoretical and computational aerodynamics (Moran)
 
+    miu = 0.0000181206; %Dynamics Viscosity
+    rho = 1.225;        %Density
+    nu = miu/rho;       %kinematics Viscosity
     Uin = Vtan*U;
+    M = length(X);
+    MP1 = M+1;
     %% .......................Calculate momentum thickness........................
     teta = zeros(M,1);
     % mencari titik stagnasi
-    for i=1:M
-        if Uin(i) == min(Uin)
-            sl = i;
-        end
-    end
-    su = sl+1;
+    sl = find(Uin==min(Uin));
+    su = sl;
 
     %upper airfoil
     teta(su) = sqrt(0.075*nu/(abs((Uin((su)+1)-Uin(su))/(X((su)+1)-X((su))))));
@@ -62,7 +63,7 @@ function [Cf,delta] = boundarylayer(U,Vtan,X,Y)
         else if lamda(i)<=0 && lamda(i)>-0.1
             L(i) = 0.22 + 1.402*lamda(i) + 0.018*lamda(i)/(lamda(i)+0.107);
             H(i) = 2.088 + 0.0731/(lamda(i)+0.14);
-            else
+        else
             L(i) = L(i-1);
             H(i) = H(i-1);
             end
@@ -126,3 +127,5 @@ function [Cf,delta] = boundarylayer(U,Vtan,X,Y)
            YBL(i) = Y(i) - delta(i);
        end
     end
+    
+    G = Uin * delta;

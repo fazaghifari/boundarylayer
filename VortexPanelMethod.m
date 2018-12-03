@@ -1,4 +1,4 @@
-function [Vtan,X,Y,Cp] = VortexPanelMethod()
+function [Vtanabs,X,Y,Cp,Xb,Yb] = VortexPanelMethod(aoa,G)
     load airfoil_coord.txt;
 
     %Reverse indexing, panel 1 begin from lower section trailing edge
@@ -8,7 +8,7 @@ function [Vtan,X,Y,Cp] = VortexPanelMethod()
 
     M = length(Xb)-1;
     MP1 = M + 1;
-    Alpha = 0 * pi/180;
+    Alpha = aoa * pi/180;
 
 
     for i=1:M
@@ -19,7 +19,7 @@ function [Vtan,X,Y,Cp] = VortexPanelMethod()
         Theta(i) = atan2(Yb(ip1)-Yb(i), Xb(ip1)-Xb(i));
         Sine(i) = sin (Theta(i));
         Cosine(i) = cos (Theta(i));
-        RHS(i) = sin (Theta(i) - Alpha);
+        RHS(i) = sin (Theta(i) - Alpha)-G;
         RHSC(i) = cos (Theta(i) - Alpha);
     end
     i=0;
@@ -69,3 +69,4 @@ function [Vtan,X,Y,Cp] = VortexPanelMethod()
     Gam = inv(AN)*RHS';
     Vtan = RHSC' + AT*Gam; Vplot = Vtan./max(Vtan);
     Cp = 1-Vtan.^2;
+    Vtanabs = abs(Vtan);

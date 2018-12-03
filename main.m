@@ -8,11 +8,13 @@
 clc; clear all; 
 fprintf('\t \t Laminar viscous solver for 2D airfoil\n')
 fprintf('\t \t Starting program...\n')
+G = 0;
 
 %% Main Program
 U = input('Input Freestream Velocity :');
-[Vtan,X,Y,Cp] = VortexPanelMethod();
-[Cf,delta] = boundarylayer(U,Vtan,X,Y);
+aoa = input('Input Angle of Attack :');
+[Vtan,X,Y,Cp,Xb,Yb] = VortexPanelMethod(aoa,G);
+[Cf,delta,G] = boundarylayer(U,Vtan,X,Y);
 
 %% Plotting
 CpPlot = -Cp./max(Cp);

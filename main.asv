@@ -1,0 +1,13 @@
+%% Laminar Viscous Solver
+% name    : LVS 2D Airfoil 
+% author  : Irsyad L, Ghifari A. F, Rashid
+% date    : December 2018
+% version : 1.0
+
+%% clearing display and variables 
+clc; clear all; 
+fprintf('\t \t Laminar viscous solver for 2D airfoil\n')
+fprintf('\t \t Starting program...\n')
+
+%% Main Program
+file = input('Input Freestream Velocity :','s'); 

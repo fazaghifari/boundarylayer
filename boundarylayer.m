@@ -57,15 +57,19 @@ function [Cf,delta,Gee,YBL,transp1,transp2] = boundarylayer(U,Vtan,X,Y)
     %shear stress at wall
     %upper
     for i = su:M
+        z = 0.25 - lamda(i);
         if lamda(i)<0.1 && lamda(i)>0
             L(i) = 0.22 + 1.57*lamda(i) -1.8*lamda(i)^2;
             H(i) = 2.61 - 3.75*lamda(i) + 5.24*lamda(i)^2;
         else if lamda(i)<=0 && lamda(i)>-0.1
             L(i) = 0.22 + 1.402*lamda(i) + 0.018*lamda(i)/(lamda(i)+0.107);
             H(i) = 2.088 + 0.0731/(lamda(i)+0.14);
+        else if 0.1<= lamda <= 0.25
+            H(i)= 2.0 + 4.14*z - 83.5*z^2 + 854*z^3 - 3337*z^4 + 4576*z^5 ;
         else
             L(i) = L(i-1);
             H(i) = H(i-1);
+            end
             end
         end
         if teta(i)==0
@@ -75,7 +79,9 @@ function [Cf,delta,Gee,YBL,transp1,transp2] = boundarylayer(U,Vtan,X,Y)
         end
         delta(i) = teta(i)*H(i);
     end
+    
     %lower
+    z = 0.25 - lamda(i);
     for i = sl:-1:1
         if lamda(i)<0.1 && lamda(i)>0
             L(i) = 0.22 + 1.57*lamda(i) -1.8*lamda(i)^2;
@@ -83,9 +89,12 @@ function [Cf,delta,Gee,YBL,transp1,transp2] = boundarylayer(U,Vtan,X,Y)
         else if lamda(i)<=0 && lamda(i)>-0.1
             L(i) = 0.22 + 1.402*lamda(i) + 0.018*lamda(i)/(lamda(i)+0.107);
             H(i) = 2.088 + 0.0731/(lamda(i)+0.14);
-            else
+        else if 0.1<= lamda <= 0.25
+            H(i)= 2.0 + 4.14*z - 83.5*z^2 + 854*z^3 - 3337*z^4 + 4576*z^5 ;
+        else
             L(i) = L(i+1);
             H(i) = H(i+1);
+            end
             end
         end
         if teta(i)==0

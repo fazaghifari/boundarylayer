@@ -1,4 +1,4 @@
-function [Cf,delta,Gee,YBL,transp1,transp2] = boundarylayer(U,Vtan,X,Y)
+function [Cf,delta,Gee,YBL] = boundarylayer(U,Vtan,X,Y)
     %% ________________________________THWAITES__________________________________
     %Referensi : Dinamika Fluida (Lavi R Zuhal), Viscous Flow (Frank White),Intro
                 % to theoretical and computational aerodynamics (Moran)
@@ -133,21 +133,6 @@ function [Cf,delta,Gee,YBL,transp1,transp2] = boundarylayer(U,Vtan,X,Y)
      
      %Upper Section
      for i=su:M
-     Reteta = Uin(i)* teta(i)/nu;
-     Rex = Uin(i)* X(i)/nu;
-     RR = 2.8*Rex^0.4;
-        if Reteta >= RR
-            transp1 = i;
-            break;
-        end
+     Reteta = Uin(i)* teta(i)/
      end
      %Lower Section
-     for i=sl:-1:1
-     Reteta = Uin(i)* teta(i)/nu;
-     Rex = Uin(i)* X(i)/nu;
-     RR = 2.8*Rex^0.4;
-        if Reteta >= RR
-            transp2 = i;
-            break;
-        end
-     end

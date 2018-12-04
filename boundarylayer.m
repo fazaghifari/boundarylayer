@@ -22,7 +22,7 @@ function [Cf,delta,Gee,YBL,transp1,transp2] = boundarylayer(U,Vtan,X,Y)
         for i=su+1:j
             integral1 = integral1 + (Uin(i)^5 + Uin(i-1)^5)*abs((X(i)-X(i-1)))/2 ;
         end
-        teta(j) = sqrt(0.45*nu*(integral1)/(Uin(j)^6));
+        teta(j) = sqrt(0.45*nu*(integral1+teta(j-1))/(Uin(j)^6));
     end
     %lower airfoil
     teta(sl) = sqrt(0.075*nu/(abs((Uin((sl)-1)-Uin(sl))/(X((sl)-1)-X((sl))))));
@@ -31,7 +31,7 @@ function [Cf,delta,Gee,YBL,transp1,transp2] = boundarylayer(U,Vtan,X,Y)
         for i=sl-1:-1:j
             integral1 = integral1 + (Uin(i)^5 + Uin(i+1)^5)*abs((X(i)-X(i+1)))/2 ;
         end
-        teta(j) = sqrt(0.45*nu*(integral1)/(Uin(j)^6));
+        teta(j) = sqrt(0.45*nu*(integral1+teta(j+1))/(Uin(j)^6));
     end
 
 

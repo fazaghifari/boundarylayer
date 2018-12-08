@@ -13,7 +13,7 @@ function [Vtanabs,X,Y,Cp,Xb,Yb] = VortexPanelMethod(aoa,Gee,Xb,Yb)
         Theta(i) = atan2(Yb(ip1)-Yb(i), Xb(ip1)-Xb(i));
         Sine(i) = sin (Theta(i));
         Cosine(i) = cos (Theta(i));
-        RHS(i) = sin (Theta(i) - Alpha)- Gee(i);
+        RHS(i) = sin (Theta(i) - Alpha)+ Gee(i);
         RHSC(i) = cos (Theta(i) - Alpha);
     end
     i=0;
@@ -57,7 +57,7 @@ function [Vtanabs,X,Y,Cp,Xb,Yb] = VortexPanelMethod(aoa,Gee,Xb,Yb)
         for j=2:M
             AN(MP1,j) = 0;
         end
-        RHS(MP1) = 0;
+        RHS(MP1) = 0+Gee(MP1);
     end
 
     Gam = inv(AN)*RHS';

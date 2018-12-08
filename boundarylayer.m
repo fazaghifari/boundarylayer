@@ -1,4 +1,4 @@
-function [Cf,delta,Gee,YBL,transp1,transp2] = boundarylayer(U,Vtan,X,Y)
+function [Cf1,Cf2,delta,Gee,YBL,transp1,transp2,su,sl] = boundarylayer(U,Vtan,X,Y)
     %% ________________________________THWAITES__________________________________
     %Referensi : Dinamika Fluida (Lavi R Zuhal), Viscous Flow (Frank White),Intro
                 % to theoretical and computational aerodynamics (Moran)
@@ -22,7 +22,7 @@ function [Cf,delta,Gee,YBL,transp1,transp2] = boundarylayer(U,Vtan,X,Y)
         for i=su+1:j
             integral1 = integral1 + (Uin(i)^5 + Uin(i-1)^5)*abs((X(i)-X(i-1)))/2 ;
         end
-        teta(j) = sqrt(0.45*nu*(integral1+teta(j-1))/(Uin(j)^6));
+        teta(j) = sqrt(0.45*nu*(integral1)/(Uin(j)^6));
     end
     %lower airfoil
     teta(sl) = sqrt(0.075*nu/(abs((Uin((sl)-1)-Uin(sl))/(X((sl)-1)-X((sl))))));
@@ -31,7 +31,7 @@ function [Cf,delta,Gee,YBL,transp1,transp2] = boundarylayer(U,Vtan,X,Y)
         for i=sl-1:-1:j
             integral1 = integral1 + (Uin(i)^5 + Uin(i+1)^5)*abs((X(i)-X(i+1)))/2 ;
         end
-        teta(j) = sqrt(0.45*nu*(integral1+teta(j+1))/(Uin(j)^6));
+        teta(j) = sqrt(0.45*nu*(integral1)/(Uin(j)^6));
     end
 
 
@@ -50,8 +50,11 @@ function [Cf,delta,Gee,YBL,transp1,transp2] = boundarylayer(U,Vtan,X,Y)
 
     %% ............Calculate wall shear-stress and displacement thickness.........
     L = zeros(M,1);
+    S = zeros(M,1);
     H = zeros(M,1);
-    Cf = zeros(M,1);
+    Cf1 = zeros(M,1); %Obtained using l
+    Cf2 = zeros(M,1); %Obtained using tau wall, Cf1 and Cf2 have the same physical meaning, only different in the way to obtain them
+    tauw = zeros(M,1);
     delta = zeros(M,1);
     YBL = zeros(M,1);
     %shear stress at wall
@@ -61,23 +64,30 @@ function [Cf,delta,Gee,YBL,transp1,transp2] = boundarylayer(U,Vtan,X,Y)
         if lamda(i)<0.1 && lamda(i)>0
             L(i) = 0.22 + 1.57*lamda(i) -1.8*lamda(i)^2;
             H(i) = 2.61 - 3.75*lamda(i) + 5.24*lamda(i)^2;
+            S(i) = (lamda(i)+0.09)^0.62;
         else if lamda(i)<=0 && lamda(i)>-0.1
             L(i) = 0.22 + 1.402*lamda(i) + 0.018*lamda(i)/(lamda(i)+0.107);
             H(i) = 2.088 + 0.0731/(lamda(i)+0.14);
+            S(i) = (lamda(i)+0.09)^0.62;
         else if 0.1<= lamda <= 0.25
             H(i)= 2.0 + 4.14*z - 83.5*z^2 + 854*z^3 - 3337*z^4 + 4576*z^5 ;
+            S(i) = (lamda(i)+0.09)^0.62;
+            L(i) = L(i-1);
         else
             L(i) = L(i-1);
             H(i) = H(i-1);
+            S(i) = S(i-1);
             end
             end
         end
         if teta(i)==0
-            Cf(i) = 0;
+            Cf1(i) = 0;
         else
-            Cf(i) = 2*L(i)*nu/(Uin(i)*teta(i));
+            Cf1(i) = 2*L(i)*nu/(Uin(i)*teta(i));
         end
+        tauw(i) = S(i)*miu*Uin(i)/teta(i);
         delta(i) = teta(i)*H(i);
+        Cf2(i) = tauw(i)/(0.5*rho*Uin(i)^2);
     end
     
     %lower
@@ -86,23 +96,30 @@ function [Cf,delta,Gee,YBL,transp1,transp2] = boundarylayer(U,Vtan,X,Y)
         if lamda(i)<0.1 && lamda(i)>0
             L(i) = 0.22 + 1.57*lamda(i) -1.8*lamda(i)^2;
             H(i) = 2.61 - 3.75*lamda(i) + 5.24*lamda(i)^2;
+            S(i) = (lamda(i)+0.09)^0.62;
         else if lamda(i)<=0 && lamda(i)>-0.1
             L(i) = 0.22 + 1.402*lamda(i) + 0.018*lamda(i)/(lamda(i)+0.107);
             H(i) = 2.088 + 0.0731/(lamda(i)+0.14);
+            S(i) = (lamda(i)+0.09)^0.62;
         else if 0.1<= lamda <= 0.25
             H(i)= 2.0 + 4.14*z - 83.5*z^2 + 854*z^3 - 3337*z^4 + 4576*z^5 ;
+            S(i) = (lamda(i)+0.09)^0.62;
+            L(i) = L(i+1);
         else
             L(i) = L(i+1);
             H(i) = H(i+1);
+            S(i) = S(i+1);
             end
             end
         end
         if teta(i)==0
-            Cf(i) = 0;
+            Cf1(i) = 0;
         else
-            Cf(i) = 2*L(i)*nu/(Uin(i)*teta(i));
+            Cf1(i) = 2*L(i)*nu/(Uin(i)*teta(i));
         end
+        tauw(i) = S(i)*miu*Uin(i)/teta(i);
         delta(i) = teta(i)*H(i);
+        Cf2(i) = tauw(i)/(0.5*rho*Uin(i)^2);
     end
     %evaluate separation point
     %upper
@@ -138,6 +155,7 @@ function [Cf,delta,Gee,YBL,transp1,transp2] = boundarylayer(U,Vtan,X,Y)
     end
     
     Gee = (Uin .* delta)';
+    Gee(MP1) = Gee(M);
      %% ..............Calculate Transition Location...............
      
      %Upper Section
@@ -148,6 +166,8 @@ function [Cf,delta,Gee,YBL,transp1,transp2] = boundarylayer(U,Vtan,X,Y)
         if Reteta >= RR
             transp1 = i;
             break;
+        else
+            transp1 = M-1;
         end
      end
      %Lower Section
@@ -158,5 +178,7 @@ function [Cf,delta,Gee,YBL,transp1,transp2] = boundarylayer(U,Vtan,X,Y)
         if Reteta >= RR
             transp2 = i;
             break;
+        else
+            transp2 = 1;
         end
      end

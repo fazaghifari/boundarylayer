@@ -8,7 +8,6 @@
 clc; clear all; 
 fprintf('\t \t Laminar viscous solver for 2D airfoil\n')
 fprintf('\t \t Starting program...\n')
-delta = 0;
 deltadelta = 100;
 
 %% Main Program
@@ -20,22 +19,69 @@ foilcoord = flip(naca1408);
 Xb = foilcoord(:,1)'; 
 Yb = foilcoord(:,2)'; 
 M = length(Xb)-1;
-G = zeros(1,M);
+G = zeros(1,M+1);
 delta = zeros(M,1);
+transp1 = 0;
+transp2 = 0;
 
-for i = 1:1
+for i = 1:25
     deltaimin1 = delta;
     [Vtan,X,Y,Cp,Xb,Yb] = VortexPanelMethod(aoa,G,Xb,Yb);
-    [Cf,delta,G,YBL,transp1,transp2] = boundarylayer(U,Vtan,X,Y);
+    [Cf1,Cf2,delta,G,YBL,transp1,transp2,su,sl] = boundarylayer(U,Vtan,X,Y);
     deltadelta = sum(abs(delta-deltaimin1)./delta)*100;
+    if i == 1
+        CP1 = Cp;
+    end
 end
-
+%% Eliminate Cp Errors at trailing edge
+%Lower Cp
+%    for i = 1:M/2
+%        if abs(Cp(i))> 1 
+%            Cp(i) = CP1(i);
+%        end
+%    end
+%Upper Cp
+%    for i = 1+M/2 : M
+%        if abs(Cp(i))> 1 
+%            Cp(i) = CP1(i);
+%        end
+%    end
+%% Calculate Cl and Cd
+CP_u = 0;CP_l=0;
+CF_u = 0;CF_l=0;
+%Coefficient of lift
+%upper
+for i=su:M-1
+    CP_u = CP_u + (Cp(i+1)+Cp(i))*(X(i+1)-X(i))/2;  
+end
+%lower
+for i=sl:-1:2
+    CP_l = CP_l + (Cp(i-1)+Cp(i))*(X(i-1)-X(i))/2;
+end
+Cl = (CP_l - CP_u)*cos(aoa);
+%Coefficient of drag
+%upper
+for i=su:transp1-1
+    CF_u = CF_u + (Cf1(i+1)+Cf1(i))*(X(i+1)-X(i))/2;
+end
+%lower
+for i=sl:-1:transp2+1
+    CF_l = CF_l + (Cf1(i-1)+Cf1(i))*(X(i-1)-X(i))/2;
+end
+Cd = CF_u + CF_l ;
 
 %% Plotting
+disp('Lift and Drag Coefficients:')
+disp('Cl')
+disp(Cl)
+disp('Cd')
+disp(Cd)
+
 figure(1)
 CpPlot = -Cp./max(Cp);
 plot(Xb,Yb)
 plot(X,CpPlot,'-o')
+ylim([-1,1])
 grid on
 
 figure(2)

@@ -25,7 +25,7 @@ transp1 = 0;
 transp2 = 0;
 i=1;
 
-while deltadelta >= 0.1
+while i < 10
     deltaimin1 = delta; %thickness at previous iter
     [Vtan,X,Y,Cp,Xb,Yb] = VortexPanelMethod(aoa,G,Xb,Yb); %solve vortex panel
     [Cf1,Cf2,delta,G,YBL,transp1,transp2,su,sl] = boundarylayer(U,Vtan,X,Y); %solve BL

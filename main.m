@@ -26,10 +26,10 @@ transp2 = 0;
 i=1;
 
 while deltadelta >= 0.1
-    deltaimin1 = delta;
-    [Vtan,X,Y,Cp,Xb,Yb] = VortexPanelMethod(aoa,G,Xb,Yb);
-    [Cf1,Cf2,delta,G,YBL,transp1,transp2,su,sl] = boundarylayer(U,Vtan,X,Y);
-    deltadelta = sum(abs(delta-deltaimin1)./delta)*100;
+    deltaimin1 = delta; %thickness at previous iter
+    [Vtan,X,Y,Cp,Xb,Yb] = VortexPanelMethod(aoa,G,Xb,Yb); %solve vortex panel
+    [Cf1,Cf2,delta,G,YBL,transp1,transp2,su,sl] = boundarylayer(U,Vtan,X,Y); %solve BL
+    deltadelta = sum(abs(delta-deltaimin1)./delta)*100; %delta(difference) of delta star (BL thickness)
     if i == 1
         CP1 = Cp;
     end

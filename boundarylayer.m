@@ -155,7 +155,7 @@ function [Cf1,Cf2,delta,Gee,YBL,transp1,transp2,su,sl] = boundarylayer(U,Vtan,X,
     end
     
     Gee = (Uin .* delta)';
-    Gee(MP1) = Gee(M);
+    Gee(MP1) = Gee(1);
      %% ..............Calculate Transition Location...............
      
      %Upper Section

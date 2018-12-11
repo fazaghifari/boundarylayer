@@ -23,9 +23,8 @@ G = zeros(1,M+1);
 delta = zeros(M,1);
 transp1 = 0;
 transp2 = 0;
-i=1;
 
-while deltadelta >= 0.1
+for i = 1:250
     deltaimin1 = delta;
     [Vtan,X,Y,Cp,Xb,Yb] = VortexPanelMethod(aoa,G,Xb,Yb);
     [Cf1,Cf2,delta,G,YBL,transp1,transp2,su,sl] = boundarylayer(U,Vtan,X,Y);
@@ -33,8 +32,6 @@ while deltadelta >= 0.1
     if i == 1
         CP1 = Cp;
     end
-    disp(deltadelta);
-    i=i+1;
 end
 %% Eliminate Cp Errors at trailing edge
 %Lower Cp

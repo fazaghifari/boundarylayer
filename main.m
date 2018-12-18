@@ -8,11 +8,13 @@
 clc; clear all; 
 fprintf('\t \t Laminar viscous solver for 2D airfoil\n')
 fprintf('\t \t Starting program...\n')
-deltadelta = 100;
+errordelta = 100;
 
 %% Main Program
 U = input('Input Freestream Velocity :');
 aoa = input('Input Angle of Attack :');
+Tfs = input('Input Freestream Temperature (K) :');
+Twall = input('Input Airfoil Surface Temperature (K) :');
 load naca1408.txt;
 %Reverse indexing, panel 1 begin from lower section trailing edge
 foilcoord = flip(naca1408);
@@ -25,30 +27,31 @@ transp1 = 0;
 transp2 = 0;
 i=1;
 
-while i < 10
+while errordelta >= 0.00001
     deltaimin1 = delta; %thickness at previous iter
     [Vtan,X,Y,Cp,Xb,Yb] = VortexPanelMethod(aoa,G,Xb,Yb); %solve vortex panel
     [Cf1,Cf2,delta,G,YBL,transp1,transp2,su,sl] = boundarylayer(U,Vtan,X,Y); %solve BL
-    deltadelta = sum(abs(delta-deltaimin1)./delta)*100; %delta(difference) of delta star (BL thickness)
+    errordelta = sum(abs(delta-deltaimin1)./delta)*100; %delta(difference) of delta star (BL thickness)
     if i == 1
         CP1 = Cp;
     end
-    disp(deltadelta);
+    disp(errordelta);
     i=i+1;
 end
-%% Eliminate Cp Errors at trailing edge
-%Lower Cp
-    for i = 1:M/2
-        if abs(Cp(i))> 1 
-            Cp(i) = CP1(i);
-        end
-    end
-%Upper Cp
-    for i = 1+M/2 : M
-        if abs(Cp(i))> 1 
-            Cp(i) = CP1(i);
-        end
-    end
+[qwall,delc,Ythermal] = thermal(Twall,Tfs,U,Vtan,X,Y);
+% %% Eliminate Cp Errors at trailing edge
+% %Lower Cp
+%     for i = 1:M/2
+%         if abs(Cp(i))> 1 
+%             Cp(i) = CP1(i);
+%         end
+%     end
+% %Upper Cp
+%     for i = 1+M/2 : M
+%         if abs(Cp(i))> 1 
+%             Cp(i) = CP1(i);
+%         end
+%     end
 %% Calculate Cl and Cd
 CP_u = 0;CP_l=0;
 CF_u = 0;CF_l=0;
@@ -88,7 +91,7 @@ ylim([-1,1])
 grid on
 
 figure(2)
-plot(X,Y,X,YBL)
+plot(X,Y,'k',X,YBL,'b',X,Ythermal,'r')
 legend('airfoil','boundary layer')
 title('Boundary Layer')
 axis([0 1 -0.3 0.3]);

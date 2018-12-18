@@ -27,11 +27,11 @@ transp1 = 0;
 transp2 = 0;
 i=1;
 
-while errordelta >= 0.00001
+while errordelta >= 1e-05
     deltaimin1 = delta; %thickness at previous iter
     [Vtan,X,Y,Cp,Xb,Yb] = VortexPanelMethod(aoa,G,Xb,Yb); %solve vortex panel
     [Cf1,Cf2,delta,G,YBL,transp1,transp2,su,sl] = boundarylayer(U,Vtan,X,Y); %solve BL
-    errordelta = sum(abs(delta-deltaimin1)./delta)*100; %delta(difference) of delta star (BL thickness)
+    errordelta = sum(abs(delta-deltaimin1)./delta); %delta(difference) of delta star (BL thickness)
     if i == 1
         CP1 = Cp;
     end
@@ -39,6 +39,9 @@ while errordelta >= 0.00001
     i=i+1;
 end
 [qwall,delc,Ythermal] = thermal(Twall,Tfs,U,Vtan,X,Y);
+
+xtransp1 = X(transp1); ytransp1 = Y(transp1);
+xtransp2 = X(transp2); ytransp2 = Y(transp2);
 % %% Eliminate Cp Errors at trailing edge
 % %Lower Cp
 %     for i = 1:M/2
@@ -88,11 +91,13 @@ CpPlot = -Cp./max(Cp);
 plot(Xb,Yb)
 plot(X,CpPlot,'-o')
 ylim([-1,1])
+xlabel('X')
+ylabel('Cp')
 grid on
 
 figure(2)
-plot(X,Y,'k',X,YBL,'b',X,Ythermal,'r')
-legend('airfoil','boundary layer')
+plot(X,Y,'k',X,YBL,'b',X,Ythermal,'r',xtransp1,ytransp1,'x',xtransp2,ytransp2,'^')
+legend('airfoil','momentum boundary layer', 'thermal boundary layer','transition 1','transition 2')
 title('Boundary Layer')
 axis([0 1 -0.3 0.3]);
 xlabel('X')

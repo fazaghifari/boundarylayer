@@ -15,9 +15,9 @@ U = input('Input Freestream Velocity :');
 aoa = input('Input Angle of Attack :');
 Tfs = input('Input Freestream Temperature (K) :');
 Twall = input('Input Airfoil Surface Temperature (K) :');
-load naca1408.txt;
+load naca2410.txt;
 %Reverse indexing, panel 1 begin from lower section trailing edge
-foilcoord = flip(naca1408);
+foilcoord = flip(naca2410);
 Xb = foilcoord(:,1)'; 
 Yb = foilcoord(:,2)'; 
 M = length(Xb)-1;
@@ -87,12 +87,12 @@ disp('Cd')
 disp(Cd)
 
 figure(1)
-CpPlot = -Cp./max(Cp);
+CpPlot = -Cp;
 plot(Xb,Yb)
 plot(X,CpPlot,'-o')
 ylim([-1,1])
 xlabel('X')
-ylabel('Cp')
+ylabel('-Cp')
 grid on
 
 figure(2)
@@ -103,3 +103,10 @@ axis([0 1 -0.3 0.3]);
 xlabel('X')
 ylabel('Y')            
 grid on; 
+
+figure(3)
+plot(Xb,Yb)
+plot(X,qwall,'-o')
+xlabel('X')
+ylabel('q wall (W/m2)')
+grid on
